@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>latency</name>
+    <events>
+        <variable constant="0" name="last_timestamp" sid="222098605596126" static="0" type="number">0</variable>
+        <variable constant="0" name="latency" sid="8435295758483693" static="0" type="number">0</variable>
+        <variable constant="0" name="clock_offset" sid="4849348624651951" static="0" type="number">0</variable>
+        <variable constant="0" name="local_ping_received" sid="7173512975118832" static="0" type="number">0</variable>
+        <variable constant="0" name="ping_sent_t" sid="6685700391217764" static="0" type="number">0</variable>
+        <variable constant="0" name="ping_str" sid="109207073638983" static="0" type="text">{&quot;.sv&quot;:&quot;timestamp&quot;}</variable>
+        <variable constant="0" name="forget_factor" sid="8530730220064597" static="0" type="number">0.5</variable>
+        <comment>we send a ping, first the optimistic transaction will fire event immediately but using the local time, it will then send a second reply once the server actually writes the value, so we need to ignore the first but listen to the second</comment>
+        <event-block sid="7516210170690026">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="6227916470284099" type="System" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="6069184888815351" type="System">
+                    <param id="0" name="Variable">local_ping_received</param>
+                    <param id="1" name="Value">1</param>
+                </action>
+                <action id="14" name="Log" sid="7112052194122851" type="Browser">
+                    <param id="0" name="Type">0</param>
+                    <param id="1" name="Message">&quot;start latency measuring....&quot;</param>
+                </action>
+                <action id="3" name="Register Callback" sid="4067227026444597" type="Firebase">
+                    <param id="0" name="DataRef">&quot;/ping/&quot; &amp; name</param>
+                    <param id="1" name="Tag">&quot;ping&quot;</param>
+                    <param id="2" name="eventType ">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="4894665671948915">
+            <conditions>
+                <condition id="0" name="Firebase callback" sid="2088632627357333" type="Firebase">
+                    <param id="0" name="Tag">&quot;ping&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="11" name="Set JSON Value with acknowledgment" sid="7439121111501206" type="Firebase">
+                    <param id="0" name="DataRef">&quot;/ping/&quot; &amp; name</param>
+                    <param id="1" name="JSON Value">ping_str</param>
+                    <param id="2" name="onComplete Tag">&quot;ping_recieved&quot;</param>
+                </action>
+                <action id="-9" name="Set value" sid="6447779032767474" type="System">
+                    <param id="0" name="Variable">ping_sent_t</param>
+                    <param id="1" name="Value">Date.UnixTimestamp</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="8646615088414383">
+            <conditions>
+                <condition id="0" name="Firebase callback" sid="1955128734674323" type="Firebase">
+                    <param id="0" name="Tag">&quot;ping_recieved&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="1138775304804569" type="System">
+                    <param id="0" name="Variable">latency</param>
+                    <param id="1" name="Value">Function.Call(&quot;filter&quot;, forget_factor, latency, (Date.UnixTimestamp - ping_sent_t) / 2)</param>
+                </action>
+                <action id="11" name="Set JSON Value with acknowledgment" sid="764656625904009" type="Firebase">
+                    <param id="0" name="DataRef">&quot;/ping/&quot; &amp; name</param>
+                    <param id="1" name="JSON Value">ping_str</param>
+                    <param id="2" name="onComplete Tag">&quot;ping_recieved&quot;</param>
+                </action>
+                <action id="14" name="Log" sid="8522414908738724" type="Browser">
+                    <param id="0" name="Type">0</param>
+                    <param id="1" name="Message">&quot;ping recieved&quot;</param>
+                </action>
+                <action id="-9" name="Set value" sid="4847564225513717" type="System">
+                    <param id="0" name="Variable">ping_sent_t</param>
+                    <param id="1" name="Value">Date.UnixTimestamp</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="9703540165631893">
+            <conditions>
+                <condition id="0" name="On function" sid="9698238971418247" type="Function">
+                    <param id="0" name="Name">&quot;update_clock_offset&quot;</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <variable constant="0" name="timestamp" sid="7909623628578806" static="0" type="number">0</variable>
+                <variable constant="0" name="uid" sid="8794751299422042" static="0" type="number">0</variable>
+                <event-block sid="5029011778863593">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="3047950624559446" type="System">
+                            <param id="0" name="First value">0</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Set value" sid="2215805575618189" type="System">
+                            <param id="0" name="Variable">timestamp</param>
+                            <param id="1" name="Value">Function.Param(0)</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="8454729958814312" type="System">
+                            <param id="0" name="Variable">uid</param>
+                            <param id="1" name="Value">Function.Param(1)</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="9470346353189884">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="6592329525322949" type="System">
+                                    <param id="0" name="First value">timestamp</param>
+                                    <param id="1" name="Comparison">4</param>
+                                    <param id="2" name="Second value">last_timestamp</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="3357346956752513">
+                                    <conditions>
+                                        <condition id="3" name="Has key" sid="3247629616132112" type="clock_update_counter">
+                                            <param id="0" name="Key">uid</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="198485250308132" type="System">
+                                            <param id="0" name="Variable">last_timestamp</param>
+                                            <param id="1" name="Value">timestamp</param>
+                                        </action>
+                                        <action id="-9" name="Set value" sid="9822407523920854" type="System">
+                                            <param id="0" name="Variable">clock_offset</param>
+                                            <param id="1" name="Value">Function.Call(&quot;filter&quot;, forget_factor, clock_offset, Date.UnixTimestamp - timestamp - latency)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="5949727179271368">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="5813508096336585" type="System" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="0" name="Add key" sid="4951217100887332" type="clock_update_counter">
+                                            <param id="0" name="Key">uid</param>
+                                            <param id="1" name="Value">0</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="3806193600613348">
+            <conditions>
+                <condition id="0" name="On function" sid="725730075626583" type="Function">
+                    <param id="0" name="Name">&quot;filter&quot;</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <variable constant="0" name="forgetting_factor" sid="3760828151533621" static="0" type="number">0</variable>
+                <variable constant="0" name="old" sid="9109007453554596" static="0" type="number">0</variable>
+                <variable constant="0" name="new" sid="9660071096291195" static="0" type="number">0</variable>
+                <event-block sid="6174514107973125">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="6764617225205188" type="System">
+                            <param id="0" name="First value">0</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Set value" sid="8168410907473986" type="System">
+                            <param id="0" name="Variable">forgetting_factor</param>
+                            <param id="1" name="Value">Function.Param(0)</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="8952690893428259" type="System">
+                            <param id="0" name="Variable">old</param>
+                            <param id="1" name="Value">Function.Param(1)</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="2434778561860848" type="System">
+                            <param id="0" name="Variable">new</param>
+                            <param id="1" name="Value">Function.Param(2)</param>
+                        </action>
+                        <action id="1" name="Set return value" sid="4849881560070955" type="Function">
+                            <param id="0" name="Value">forgetting_factor*new + (1-forgetting_factor) * old</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+    </events>
+</c2eventsheet>

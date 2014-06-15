@@ -1,0 +1,712 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>Melee</name>
+    <events>
+        <include>latency</include>
+        <variable constant="0" name="name" sid="5299368940079705" static="0" type="text">player</variable>
+        <variable constant="0" name="room" sid="6655771305556762" static="0" type="text">room_test</variable>
+        <variable constant="1" name="MOVE_SPEED" sid="4472090063625175" static="0" type="number">40</variable>
+        <variable constant="0" name="current_move_angle" sid="46542815527252" static="0" type="number">0</variable>
+        <variable constant="0" name="current_move_speed" sid="7534172199760149" static="0" type="number">0</variable>
+        <variable constant="0" name="latency_mode" sid="9057342393715383" static="0" type="text">server_no_clock</variable>
+        <comment>NOTE. rex_hash had its deliminators changed from &quot;.&quot; to &quot;|&quot; as the . clashed with firebase timestamp deliminator</comment>
+        <comment>this is the set t|.sv &quot;timestamp&quot; hack does</comment>
+        <event-block sid="4979112647348372">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="2567709927378991" type="System" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="5242317012666997" type="System">
+                    <param id="0" name="Variable">name</param>
+                    <param id="1" name="Value">&quot;player&quot; &amp; int(random(100)) &amp; &quot;_&quot;</param>
+                </action>
+                <action id="-9" name="Set value" sid="9300285551050302" type="System">
+                    <param id="0" name="Variable">room</param>
+                    <param id="1" name="Value">Browser.QueryParam(&quot;room&quot;)</param>
+                </action>
+                <action id="3" name="Register Callback" sid="5721491503388724" type="Firebase">
+                    <param id="0" name="DataRef">room &amp; &quot;/players&quot;</param>
+                    <param id="1" name="Tag">&quot;player_added&quot;</param>
+                    <param id="2" name="eventType ">1</param>
+                </action>
+                <action id="3" name="Register Callback" sid="3792453576099539" type="Firebase">
+                    <param id="0" name="DataRef">room &amp; &quot;/bullets&quot;</param>
+                    <param id="1" name="Tag">&quot;bullet_added&quot;</param>
+                    <param id="2" name="eventType ">1</param>
+                </action>
+                <action id="-3" name="Create object" sid="6988844916093765" type="System">
+                    <param id="0" name="Object to create">Player</param>
+                    <param id="1" name="Layer">0</param>
+                    <param id="2" name="X">random(WindowWidth)</param>
+                    <param id="3" name="Y">random(WindowHeight)</param>
+                </action>
+                <action id="3" name="Register Callback" sid="8071013282432533" type="Firebase">
+                    <param id="0" name="DataRef">room &amp; &quot;/ff&quot;</param>
+                    <param id="1" name="Tag">&quot;ff&quot;</param>
+                    <param id="2" name="eventType ">0</param>
+                </action>
+                <action id="3" name="Register Callback" sid="5657187492361981" type="Firebase">
+                    <param id="0" name="DataRef">room &amp; &quot;/latency_mode&quot;</param>
+                    <param id="1" name="Tag">&quot;latency_mode&quot;</param>
+                    <param id="2" name="eventType ">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="7846449715711161">
+            <conditions>
+                <condition id="0" name="Firebase callback" sid="5005817349475199" type="Firebase">
+                    <param id="0" name="Tag">&quot;player_added&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-3" name="Create object" sid="5345978909053229" type="System">
+                    <param id="0" name="Object to create">EnemyRemote</param>
+                    <param id="1" name="Layer">0</param>
+                    <param id="2" name="X">0</param>
+                    <param id="3" name="Y">0</param>
+                </action>
+                <action id="0" name="Add key" sid="1242413604329069" type="Objects">
+                    <param id="0" name="Key">Firebase.Ref</param>
+                    <param id="1" name="Value">EnemyRemote.UID</param>
+                </action>
+                <action id="3" name="Register Callback" sid="5237735244256529" type="Firebase">
+                    <param id="0" name="DataRef">Firebase.Ref</param>
+                    <param id="1" name="Tag">&quot;interpolater_update&quot;</param>
+                    <param id="2" name="eventType ">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="1016977819228547">
+            <conditions>
+                <condition id="0" name="Firebase callback" sid="7577244322160719" type="Firebase">
+                    <param id="0" name="Tag">&quot;bullet_added&quot;</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-3" name="Create object" sid="9013960702049798" type="System">
+                    <param id="0" name="Object to create">BulletRemote</param>
+                    <param id="1" name="Layer">0</param>
+                    <param id="2" name="X">0</param>
+                    <param id="3" name="Y">0</param>
+                </action>
+                <action id="0" name="Add key" sid="241890818247518" type="Objects">
+                    <param id="0" name="Key">Firebase.Ref</param>
+                    <param id="1" name="Value">BulletRemote.UID</param>
+                </action>
+                <action id="-10" name="Set value" sid="4057220771773329" type="BulletRemote">
+                    <param id="0" name="Instance variable">json</param>
+                    <param id="1" name="Value">Firebase.ValJSON</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="9404339504520805">
+            <conditions>
+                <condition id="0" name="Firebase callback" sid="997010063533091" type="Firebase">
+                    <param id="0" name="Tag">&quot;interpolater_update&quot;</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <event-block sid="7903069366387332">
+                    <conditions>
+                        <condition id="-14" name="Pick by unique ID" sid="4365224111370534" type="Interpolater">
+                            <param id="0" name="Unique ID">Objects.Get(Firebase.Ref)</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="9022849330829219">
+                            <conditions>
+                                <condition id="100" name="is null" sid="6802342706377022" type="Firebase" />
+                            </conditions>
+                            <actions>
+                                <action id="2" name="Delete key" sid="4778889315481709" type="Objects">
+                                    <param id="0" name="Key">Firebase.Ref</param>
+                                </action>
+                                <action id="-9" name="Destroy" sid="8470425530209876" type="Interpolater" />
+                            </actions>
+                        </event-block>
+                        <event-block sid="6230101438813324">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="4048466884058013" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="-10" name="Set value" sid="7629346709269841" type="Interpolater">
+                                    <param id="0" name="Instance variable">json</param>
+                                    <param id="1" name="Value">Firebase.ValJSON</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="3519093043771378">
+            <conditions>
+                <condition id="-11" name="For Each" sid="4252342121367711" type="System">
+                    <param id="0" name="Object">Interpolater</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="5" name="Load hash table from JSON string" sid="3202763270914565" type="MoverJSON">
+                    <param id="0" name="JSON string">Interpolater.json</param>
+                </action>
+                <action id="-8" name="Set angle" sid="6060054084971624" type="Interpolater">
+                    <param id="0" name="Angle">MoverJSON.At(&quot;angle&quot;)</param>
+                </action>
+            </actions>
+            <sub-events>
+                <comment>don&apos;t process our own timestamps so we measure transmit time from server to here not optimistic transactions</comment>
+                <event-block sid="260146042641156">
+                    <conditions>
+                        <condition id="2" name="Key exists" sid="4513334572165155" type="MoverJSON">
+                            <param id="0" name="Key string">&quot;owner&quot;</param>
+                        </condition>
+                        <condition id="-8" name="Compare two values" sid="8091708533862219" type="System">
+                            <param id="0" name="First value">MoverJSON.At(&quot;owner&quot;)</param>
+                            <param id="1" name="Comparison">1</param>
+                            <param id="2" name="Second value">name</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Call function" sid="2601977322875337" type="Function">
+                            <param id="0" name="Name">&quot;update_clock_offset&quot;</param>
+                            <param id="1" name="Parameter {n}">MoverJSON.At(&quot;t&quot;){###}Interpolater.UID</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="7729375587210522">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="800548142430946" type="System">
+                                    <param id="0" name="First value">latency_mode</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Second value">&quot;remote&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="7774244684948903" type="Interpolater">
+                                    <param id="0" name="X">MoverJSON.At(&quot;X&quot;) + cos(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;tlocal&quot;)-clock_offset)*0.001</param>
+                                </action>
+                                <action id="-2" name="Set Y" sid="255844349396988" type="Interpolater">
+                                    <param id="0" name="Y">MoverJSON.At(&quot;Y&quot;) + sin(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;tlocal&quot;) - clock_offset)*0.001</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="541458317719198">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="2937694987919782" type="System">
+                                    <param id="0" name="First value">latency_mode</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Second value">&quot;remote_no_clock&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="6664470652433162" type="Interpolater">
+                                    <param id="0" name="X">MoverJSON.At(&quot;X&quot;) + cos(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;tlocal&quot;))*0.001</param>
+                                </action>
+                                <action id="-2" name="Set Y" sid="974273429695832" type="Interpolater">
+                                    <param id="0" name="Y">MoverJSON.At(&quot;Y&quot;) + sin(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;tlocal&quot;))*0.001</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3741584917938771">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="3864961935577868" type="System">
+                                    <param id="0" name="First value">latency_mode</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Second value">&quot;server&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="2474461858098067" type="Interpolater">
+                                    <param id="0" name="X">MoverJSON.At(&quot;X&quot;) + cos(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;t&quot;)-clock_offset)*0.001</param>
+                                </action>
+                                <action id="-2" name="Set Y" sid="9280231347287306" type="Interpolater">
+                                    <param id="0" name="Y">MoverJSON.At(&quot;Y&quot;) + sin(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;t&quot;) - clock_offset)*0.001</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="2199531024324112">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="8056114286597738" type="System">
+                                    <param id="0" name="First value">latency_mode</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Second value">&quot;server_no_clock&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="6747955717227698" type="Interpolater">
+                                    <param id="0" name="X">MoverJSON.At(&quot;X&quot;) + cos(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;t&quot;))*0.001</param>
+                                </action>
+                                <action id="-2" name="Set Y" sid="4783525693758537" type="Interpolater">
+                                    <param id="0" name="Y">MoverJSON.At(&quot;Y&quot;) + sin(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;t&quot;))*0.001</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>don&apos;t do lag compensation on our own stuff, use local time but cancel out clock offset</comment>
+                <event-block sid="7755183750450701">
+                    <conditions>
+                        <condition id="2" name="Key exists" sid="68822405004525" type="MoverJSON">
+                            <param id="0" name="Key string">&quot;owner&quot;</param>
+                        </condition>
+                        <condition id="-8" name="Compare two values" sid="2017148887378203" type="System">
+                            <param id="0" name="First value">MoverJSON.At(&quot;owner&quot;)</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">name</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-1" name="Set X" sid="9834751120867948" type="Interpolater">
+                            <param id="0" name="X">MoverJSON.At(&quot;X&quot;) + cos(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;tlocal&quot;)- clock_offset)*0.001</param>
+                        </action>
+                        <action id="-2" name="Set Y" sid="4460105641953785" type="Interpolater">
+                            <param id="0" name="Y">MoverJSON.At(&quot;Y&quot;) + sin(MoverJSON.At(&quot;move_angle&quot;)) * MoverJSON.At(&quot;speed&quot;) * (Date.UnixTimestamp - MoverJSON.At(&quot;tlocal&quot;) - clock_offset)*0.001</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <comment>Sync bullets with firebase</comment>
+        <event-block sid="4698134904743795">
+            <conditions>
+                <condition id="-19" name="On destroyed" sid="8531895542300364" type="BulletLocal" />
+            </conditions>
+            <actions>
+                <action id="1" name="Set JSON Value" sid="4627799179158731" type="Firebase">
+                    <param id="0" name="DataRef">&quot;/bullets/&quot; &amp; name &amp; BulletLocal.UID</param>
+                    <param id="1" name="JSON Value">&quot;{}&quot;</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Shoot 10 times a second while holding the left mouse button down.  Adjust the bullet angle by a random amount (-4 to +4 degrees) to add some inaccuracy to the firing.</comment>
+        <event-block sid="1100784787247065">
+            <conditions>
+                <condition id="2" name="Is in touch" sid="2499015027069474" type="Touch" />
+                <condition id="-6" name="Every X seconds" sid="2214530894133877" type="System">
+                    <param id="0" name="Interval (seconds)">0.1</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Spawn another object" sid="3796268026900032" type="Player">
+                    <param id="0" name="Object">BulletLocal</param>
+                    <param id="1" name="Layer">&quot;Game&quot;</param>
+                    <param id="2" name="Image point">&quot;ShootPoint&quot;</param>
+                </action>
+                <action id="-18" name="Rotate clockwise" sid="8293221461256033" type="BulletLocal">
+                    <param id="0" name="Degrees">random(-4, 4)</param>
+                </action>
+                <action id="4" name="Clean all" sid="2962327693459885" type="BulletJSON" />
+                <action id="1" name="Set value by key string" sid="4075178024113578" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;angle&quot;</param>
+                    <param id="1" name="Value">BulletLocal.Angle</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="729157129648773" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;move_angle&quot;</param>
+                    <param id="1" name="Value">BulletLocal.Angle</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="4870132231787917" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;speed&quot;</param>
+                    <param id="1" name="Value">BulletLocal.Bullet.Speed</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="7650680330737653" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;X&quot;</param>
+                    <param id="1" name="Value">BulletLocal.X</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="2893185175501851" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;Y&quot;</param>
+                    <param id="1" name="Value">BulletLocal.Y</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="6924059866633969" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;t|.sv&quot;</param>
+                    <param id="1" name="Value">&quot;timestamp&quot;</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="9182060080655957" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;tlocal&quot;</param>
+                    <param id="1" name="Value">Date.UnixTimestamp - clock_offset</param>
+                </action>
+                <action id="1" name="Set value by key string" sid="294260074915744" type="BulletJSON">
+                    <param id="0" name="Key string">&quot;owner&quot;</param>
+                    <param id="1" name="Value">name</param>
+                </action>
+                <action id="1" name="Set JSON Value" sid="5791395292103455" type="Firebase">
+                    <param id="0" name="DataRef">room &amp; &quot;/bullets/&quot; &amp; name &amp; BulletLocal.UID</param>
+                    <param id="1" name="JSON Value">BulletJSON.HashTableToString</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>sync player with firebase and make player look at mouse</comment>
+        <comment></comment>
+        <event-block sid="7173472413433192">
+            <conditions>
+                <condition id="-6" name="Every X seconds" sid="3096092022669468" type="System">
+                    <param id="0" name="Interval (seconds)">0.1</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-22" name="Set angle toward position" sid="7386892071742727" type="Player">
+                    <param id="0" name="X">mouse.X(&quot;Game&quot;)</param>
+                    <param id="1" name="Y">mouse.Y(&quot;Game&quot;)</param>
+                </action>
+            </actions>
+            <sub-events>
+                <event-block sid="2249966833918845">
+                    <conditions>
+                        <condition id="2" name="Is in touch" sid="3921472330045476" type="Touch" />
+                    </conditions>
+                    <actions>
+                        <action id="-22" name="Set angle toward position" sid="149312779024605" type="Player">
+                            <param id="0" name="X">touch.X(&quot;Game&quot;)</param>
+                            <param id="1" name="Y">Touch.Y(&quot;Game&quot;)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="3141107774226043">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="4130334074440324" type="System">
+                            <param id="0" name="First value">0</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="4" name="Clean all" sid="4858109961998331" type="PlayerJSON" />
+                        <action id="1" name="Set value by key string" sid="162063587447275" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;move_angle&quot;</param>
+                            <param id="1" name="Value">current_move_angle</param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="6717736917996393" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;angle&quot;</param>
+                            <param id="1" name="Value">Player.Angle</param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="5311117890633717" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;speed&quot;</param>
+                            <param id="1" name="Value">current_move_speed </param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="7723397053296032" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;X&quot;</param>
+                            <param id="1" name="Value">Player.X</param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="5162878688629148" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;Y&quot;</param>
+                            <param id="1" name="Value">Player.Y</param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="2061489419800185" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;t|.sv&quot;</param>
+                            <param id="1" name="Value">&quot;timestamp&quot;</param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="9482252111121577" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;tlocal&quot;</param>
+                            <param id="1" name="Value">Date.UnixTimestamp - clock_offset</param>
+                        </action>
+                        <action id="1" name="Set value by key string" sid="8451992661453939" type="PlayerJSON">
+                            <param id="0" name="Key string">&quot;owner&quot;</param>
+                            <param id="1" name="Value">name</param>
+                        </action>
+                        <action id="1" name="Set JSON Value" sid="8796773028722528" type="Firebase">
+                            <param id="0" name="DataRef">room &amp; &quot;/players/&quot; &amp; name</param>
+                            <param id="1" name="JSON Value">PlayerJSON.HashTableToString</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-group description="" sid="8802251073822273" title="UI">
+            <sub-events>
+                <comment>Allow WASD as alternate controls to the default arrow keys.</comment>
+                <event-block sid="5640378254322571">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="8718311016031172" type="Keyboard">
+                            <param id="0" name="Key">87 (W)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-23" name="Move at angle" sid="7969195826264771" type="Player">
+                            <param id="0" name="Angle">-90</param>
+                            <param id="1" name="Distance">move_speed * dt</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="4409110613390676" type="System">
+                            <param id="0" name="Variable">current_move_angle</param>
+                            <param id="1" name="Value">-90</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="6629839227372868" type="System">
+                            <param id="0" name="Variable">current_move_speed</param>
+                            <param id="1" name="Value">MOVE_SPEED</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="767334355965348">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="7130664890749757" type="Keyboard">
+                            <param id="0" name="Key">65 (A)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-23" name="Move at angle" sid="9614572416378734" type="Player">
+                            <param id="0" name="Angle">180</param>
+                            <param id="1" name="Distance">move_speed * dt</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="547829661559846" type="System">
+                            <param id="0" name="Variable">current_move_angle</param>
+                            <param id="1" name="Value">180</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="253078331482226" type="System">
+                            <param id="0" name="Variable">current_move_speed</param>
+                            <param id="1" name="Value">MOVE_SPEED</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="5644826675214116">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="1279407908441859" type="Keyboard">
+                            <param id="0" name="Key">83 (S)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-23" name="Move at angle" sid="3742082920995196" type="Player">
+                            <param id="0" name="Angle">90</param>
+                            <param id="1" name="Distance">move_speed * dt</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="9620384226144471" type="System">
+                            <param id="0" name="Variable">current_move_angle</param>
+                            <param id="1" name="Value">90</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="4703557638307692" type="System">
+                            <param id="0" name="Variable">current_move_speed</param>
+                            <param id="1" name="Value">MOVE_SPEED</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="259901181183419">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="4618778373791061" type="Keyboard">
+                            <param id="0" name="Key">68 (D)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-23" name="Move at angle" sid="7602355899335433" type="Player">
+                            <param id="0" name="Angle">0</param>
+                            <param id="1" name="Distance">move_speed * dt</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="7735032556624326" type="System">
+                            <param id="0" name="Variable">current_move_angle</param>
+                            <param id="1" name="Value">0</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="6882646885003409" type="System">
+                            <param id="0" name="Variable">current_move_speed</param>
+                            <param id="1" name="Value">MOVE_SPEED</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="5302002992742928">
+                    <conditions>
+                        <condition id="2" inverted="1" name="Key is down" sid="1399814773169748" type="Keyboard">
+                            <param id="0" name="Key">68 (D)</param>
+                        </condition>
+                        <condition id="2" inverted="1" name="Key is down" sid="8057953779312885" type="Keyboard">
+                            <param id="0" name="Key">83 (S)</param>
+                        </condition>
+                        <condition id="2" inverted="1" name="Key is down" sid="6113522464947222" type="Keyboard">
+                            <param id="0" name="Key">65 (A)</param>
+                        </condition>
+                        <condition id="2" inverted="1" name="Key is down" sid="3698673878642382" type="Keyboard">
+                            <param id="0" name="Key">87 (W)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Set value" sid="2586995721075489" type="System">
+                            <param id="0" name="Variable">current_move_angle</param>
+                            <param id="1" name="Value">0</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="7070971759895986" type="System">
+                            <param id="0" name="Variable">current_move_speed</param>
+                            <param id="1" name="Value">0</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="6797369555353918">
+                    <conditions>
+                        <condition id="-6" name="Every X seconds" sid="2813018255879521" type="System">
+                            <param id="0" name="Interval (seconds)">0.1</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Set text" sid="7350319522943459" type="latency_text">
+                            <param id="0" name="Text">&quot;latency (ms): &quot; &amp; latency &amp; &quot; offset: &quot; &amp; clock_offset</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>when user changes the latency option, we write to firebase and let the callback handle the logic (for all clients)</comment>
+                <event-block sid="6282345934287307">
+                    <conditions>
+                        <condition id="4" name="Is touching object" sid="6529643731740905" type="Touch">
+                            <param id="0" name="Object">latency_option</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Set String Value" sid="9545719831986519" type="Firebase">
+                            <param id="0" name="DataRef">room &amp; &quot;/latency_mode&quot;</param>
+                            <param id="1" name="String Value">latency_option.type</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="7725844611376193">
+                    <conditions>
+                        <condition id="0" name="Firebase callback" sid="1976578355128401" type="Firebase">
+                            <param id="0" name="Tag">&quot;latency_mode&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="5695973671863243">
+                            <conditions>
+                                <condition id="100" inverted="1" name="is null" sid="5645613915358564" type="Firebase" />
+                            </conditions>
+                            <actions>
+                                <action id="-9" name="Set value" sid="8071948963331858" type="System">
+                                    <param id="0" name="Variable">latency_mode</param>
+                                    <param id="1" name="Value">Firebase.ValString</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="9596233904832733">
+                                    <conditions>
+                                        <condition id="-11" name="For Each" sid="618232157871155" type="System">
+                                            <param id="0" name="Object">latency_option</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="6927426199927964">
+                                            <conditions>
+                                                <condition id="-7" name="Compare instance variable" sid="9602875840037588" type="latency_option">
+                                                    <param id="0" name="Instance variable">type</param>
+                                                    <param id="1" name="Comparison">0</param>
+                                                    <param id="2" name="Value">Firebase.ValString</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="4" name="Set animation" sid="3162530256931868" type="latency_option">
+                                                    <param id="0" name="Animation">&quot;on&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="6015525882474227">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="407382883899859" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="4" name="Set animation" sid="5857268863500734" type="latency_option">
+                                                    <param id="0" name="Animation">&quot;off&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="372496378260275">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="2223015377994092" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Set String Value" sid="3457580060732475" type="Firebase">
+                                    <param id="0" name="DataRef">room &amp; &quot;/latency_mode&quot;</param>
+                                    <param id="1" name="String Value">&quot;server_no_clock&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>when user changes the forgetting factor option, we write to firebase and let the callback handle the logic (for all clients)</comment>
+                <event-block sid="1548669696206085">
+                    <conditions>
+                        <condition id="4" name="Is touching object" sid="7042012234410911" type="Touch">
+                            <param id="0" name="Object">forget_f_option</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="2" name="Set Number Value" sid="4649703063881987" type="Firebase">
+                            <param id="0" name="DataRef">room &amp; &quot;/ff&quot;</param>
+                            <param id="1" name="Number Value">forget_f_option.k</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="9179126781755058">
+                    <conditions>
+                        <condition id="0" name="Firebase callback" sid="8991955958629665" type="Firebase">
+                            <param id="0" name="Tag">&quot;ff&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="3651295046230054">
+                            <conditions>
+                                <condition id="100" inverted="1" name="is null" sid="3500229462713217" type="Firebase" />
+                            </conditions>
+                            <actions>
+                                <action id="-9" name="Set value" sid="6900458954692142" type="System">
+                                    <param id="0" name="Variable">forget_factor</param>
+                                    <param id="1" name="Value">Firebase.ValNumber</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="7734381982852948">
+                                    <conditions>
+                                        <condition id="-11" name="For Each" sid="6895968598827302" type="System">
+                                            <param id="0" name="Object">forget_f_option</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="3172227370453157">
+                                            <conditions>
+                                                <condition id="-7" name="Compare instance variable" sid="6302128066418791" type="forget_f_option">
+                                                    <param id="0" name="Instance variable">k</param>
+                                                    <param id="1" name="Comparison">0</param>
+                                                    <param id="2" name="Value">Firebase.ValNumber</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="4" name="Set animation" sid="2153046886486048" type="forget_f_option">
+                                                    <param id="0" name="Animation">&quot;on&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="754504933864467">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="7616241410856205" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="4" name="Set animation" sid="5625370627489687" type="forget_f_option">
+                                                    <param id="0" name="Animation">&quot;off&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="1265146879057204">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="4799055380640748" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="2" name="Set Number Value" sid="6623496998159276" type="Firebase">
+                                    <param id="0" name="DataRef">room &amp; &quot;/ff&quot;</param>
+                                    <param id="1" name="Number Value">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+    </events>
+</c2eventsheet>
